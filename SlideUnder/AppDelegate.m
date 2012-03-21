@@ -7,24 +7,54 @@
 //
 
 #import "AppDelegate.h"
-
-#import "ViewController.h"
+#import "InterDeviceCom.h"
+#import "MSSCommunicationController.h"
+#import "iPhoneViewController.h"
+#import "iPadViewController.h"
 
 @implementation AppDelegate
 
 @synthesize window = _window;
-@synthesize viewController = _viewController;
+@synthesize iPhoneViewController;
+@synthesize iPadViewController;
+@synthesize sharedSurfaceComController;
+@synthesize devComController;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
+    
+    devComController = [InterDeviceComController sharedController];
+    
+    devComController.delegate = [SlideUnderModel sharedModel];
+    
+    sharedSurfaceComController = [MSSCommunicationController sharedController];
+    [sharedSurfaceComController connectToHost:@"169.254.59.237" onPort:4568];
+    //[sharedSurfaceComController connectToHost:@"129.16.213.195" onPort:4568];
+    
+    devComController = [InterDeviceComController sharedController];
+    SlideUnderModel * model = [SlideUnderModel sharedModel];
+    devComController.delegate = model;
+    
+    
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        self.viewController = [[ViewController alloc] initWithNibName:@"ViewController_iPhone" bundle:nil];
+        self.iPhoneViewController = [[iPhoneViewController alloc] initWithNibName:@"ViewController_iPhone" bundle:nil];
+        self.window.rootViewController = self.iPhoneViewController;
+        sharedSurfaceComController.delegate = self.iPhoneViewController;
+        [model addObserver:self.iPhoneViewController forKeyPath:@"allVisible" options:NSKeyValueObservingOptionNew context:nil];
+        [devComController startServer];
+        
     } else {
-        self.viewController = [[ViewController alloc] initWithNibName:@"ViewController_iPad" bundle:nil];
+        self.iPadViewController = [[iPadViewController alloc] initWithNibName:@"ViewController_iPad" bundle:nil];
+        self.window.rootViewController = self.iPadViewController;
+        sharedSurfaceComController.delegate = self.iPadViewController;
+
     }
-    self.window.rootViewController = self.viewController;
+
+    [NSTimer scheduledTimerWithTimeInterval:0.1 target:(sharedSurfaceComController) selector:@selector(getContacsFromCodeine) userInfo:nil repeats:YES];
+    [NSTimer scheduledTimerWithTimeInterval:0.5 target:(sharedSurfaceComController) selector:@selector(getDevicesFromCodeine) userInfo:nil repeats:YES];
+    
     [self.window makeKeyAndVisible];
     return YES;
 }

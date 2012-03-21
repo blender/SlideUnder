@@ -8,12 +8,14 @@
 
 #import <UIKit/UIKit.h>
 
-@class ViewController;
+@class MSSCommunicationController, InterDeviceComController, iPhoneViewController, iPadViewController;
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
-
-@property (strong, nonatomic) ViewController *viewController;
+@property (strong, nonatomic) iPhoneViewController* iPhoneViewController;
+@property (strong, nonatomic) iPadViewController* iPadViewController;
+@property (strong, nonatomic) MSSCommunicationController* sharedSurfaceComController;
+@property (strong, nonatomic) InterDeviceComController* devComController;
 
 @end
