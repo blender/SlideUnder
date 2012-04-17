@@ -7,7 +7,7 @@
 //
 
 #define NUM_IMGS 5
-#define iPhoneID 0x06
+#define iPhoneID 0x09
 #define iPadID 0x00
 #ifdef SIMULATOR
 #define HALF_AN_IPHONE 230
